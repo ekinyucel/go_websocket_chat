@@ -16,23 +16,26 @@
         var input = document.querySelector("#input")
         var button = document.querySelector("#send")
 
+        // creating a WebSocket object, accepts url as a parameter
         function WsClient(url) {
-            this.ws = new WebSocket(url)
-            this.eventListener = {}
+            this.ws = new WebSocket(url);
+            this.eventListener = {};
 
-            this.on = (eventname, cb) => this.eventListener[event] = cb
+            this.on = (event, cb) => this.eventListener[event] = cb;
+
             this.emit = (name, data) => {
                 let event = {
-                    event: name,
-                    data: data
-                };
-                let input = JSON.stringify(event)
-                this.ws.send(input) // sending data to server
+                    event: name, // 'message'
+                    data: data,
+                    date: Date.now(),
+                }
+                let input = JSON.stringify(event); // creating JSON object.
+                this.ws.send(input); // sending data to server
             }
 
             this.ws.onmessage = (response) => {
                 try {
-                    let data = JSON.parse(response.data)
+                    let data = JSON.parse(response.data);
                     if (data) {
                         let cb = this.eventListener[data.event];
                         if (cb) {
@@ -40,11 +43,12 @@
                         }
                     }
                 } catch(e) {
-                    window.alert(e);
+                    console.log(e);
                 }
             }
         }
         
+        // creating a new websocket connection by connecting to server's URL. ws for HTTP. wss for HTTPS
         var ws = new WsClient('ws://' + window.location.origin.replace('http://', '') + '/ws');
 
         // when receiving response from server
@@ -56,7 +60,7 @@
         })
 
         button.onclick = () => {
-            ws.emit('message', input.value);
+            ws.emit('message', input.value); // sending data by calling ws.emit method
         }
     </script>
 </body>

@@ -7,6 +7,7 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// it is called when upgrading the HTTP connection to a websocket connection.
 var upgrader = websocket.Upgrader{
 	ReadBufferSize:  2048,
 	WriteBufferSize: 2048,
@@ -23,7 +24,8 @@ type WebSocket struct {
 	Events map[string]EventHandler
 }
 
-// OpenWebSocketConnection is used for upgrading the connection and opens a web socket connection between the client and server
+// OpenWebSocketConnection is used for upgrading the connection and opening a web socket connection between the client and server
+// Instantinating Websocket struct
 func OpenWebSocketConnection(w http.ResponseWriter, r *http.Request) (*WebSocket, error) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -37,7 +39,7 @@ func OpenWebSocketConnection(w http.ResponseWriter, r *http.Request) (*WebSocket
 		Events: make(map[string]EventHandler),
 	}
 
-	go ws.Reader() // starting reader method of websocket as a goroutine
+	go ws.Reader() // reading real-time message from client
 	go ws.Writer() // starting writer method of websocket as a goroutine
 
 	return ws, nil
@@ -51,14 +53,14 @@ func (ws *WebSocket) Reader() {
 	for {
 		_, message, err := ws.Conn.ReadMessage()
 		if err != nil {
-			log.Printf("WebSocket error message: %v", err)
+			logger.Printf("WebSocket error message: %v", err)
 			break
 		}
 		event, err := GenerateEvent(message)
 		if err != nil {
-			log.Printf("Unable to parse the message: %v", err)
+			logger.Printf("Unable to parse the message: %v", err)
 		} else {
-			log.Printf("Message: %v", event)
+			logger.Printf("Message: %v", event)
 		}
 		if action, ok := ws.Events[event.Name]; ok {
 			action(event)

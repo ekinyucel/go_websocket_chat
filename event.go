@@ -11,6 +11,7 @@ type EventHandler func(*Event)
 type Event struct {
 	Name string      `json:"event"`
 	Data interface{} `json:"data"`
+	Date int         `json:"date"`
 }
 
 // GenerateEvent function is used to create an Event type from input
