@@ -19,7 +19,7 @@
         // creating a WebSocket object, accepts url as a parameter
         function WsClient(url) {
             this.ws = new WebSocket(url);
-            this.eventListener = {};
+            this.eventListener = [];
 
             this.on = (event, cb) => this.eventListener[event] = cb;
 
@@ -36,31 +36,29 @@
             this.ws.onmessage = (response) => {
                 try {
                     let data = JSON.parse(response.data);
-                    if (data) {
-                        let cb = this.eventListener[data.event];
-                        if (cb) {
-                            cb(data.data);
-                        }
+                    if (data.event = 'message') {
+                        let msg = document.createElement('p');
+                        msg.innerText = data.data;
+                        document.body.appendChild(msg);
                     }
                 } catch(e) {
                     console.log(e);
                 }
             }
+
+            this.ws.onclose = (event) => {
+                console.log('connection closed')
+            }
         }
         
-        // creating a new websocket connection by connecting to server's URL. ws for HTTP. wss for HTTPS
+        // creating a new websocket connection object -by connecting to server's URL. ws for HTTP. wss for HTTPS
         var ws = new WsClient('ws://' + window.location.origin.replace('http://', '') + '/ws');
 
-        // when receiving response from server
-        ws.on('response', (data) => {
-            console.log("response:", data);
-            let msg = document.createElement('p');
-            msg.innerText = data;
-            document.body.appendChild(msg);
-        })
-
         button.onclick = () => {
-            ws.emit('message', input.value); // sending data by calling ws.emit method
+            if (input.value != '') {
+                ws.emit('message', input.value); // sending data by calling ws.emit method
+                input.value = '';
+            }
         }
     </script>
 </body>

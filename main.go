@@ -1,32 +1,29 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"net/http"
 	"os"
 )
 
+var addr = flag.String("addr", ":8080", "http server address")
 var logger = log.New(os.Stdout, "main package ", log.LstdFlags|log.Lshortfile)
 
 func main() {
+	flag.Parse()
+
+	hub := initHub()
+	go hub.start()
+
 	http.Handle(`/`, http.FileServer(http.Dir("./assets")))
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		ws, err := OpenWebSocketConnection(w, r)
-		if err != nil {
-			logger.Printf("Error creating web socket connection: %v", err)
-			return
-		}
-		ws.On("message", func(e *Event) {
-			logger.Printf("The message received: %s", e.Data.(string))
-			ws.Out <- (&Event{
-				Name: "response",
-				Data: e.Data.(string),
-				Date: e.Date,
-			}).Marshal()
-		})
+		serveWebSocket(hub, w, r)
 	})
 
-	logger.Println("The server is listening on port 8080")
-	http.ListenAndServe(":8080", nil)
+	logger.Printf("The server is listening on port %v", *addr)
+	if err := http.ListenAndServe(*addr, nil); err != nil {
+		logger.Fatalf("ListenAndServe: %v", err)
+	}
 }
