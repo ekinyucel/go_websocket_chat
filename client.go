@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/satori/go.uuid"
 )
 
 // it is called when upgrading the HTTP connection to a websocket connection.
@@ -18,9 +19,10 @@ var upgrader = websocket.Upgrader{
 
 // Client struct defines types for handling client side operations
 type Client struct {
+	id   [16]byte
 	hub  *Hub
 	conn *websocket.Conn
-	send chan []byte // outbound channel of a client	
+	send chan []byte // outbound channel of a client
 }
 
 // reader reads messages from the websocket connection to hub.
@@ -80,13 +82,20 @@ func (c *Client) writer() {
 	}
 }
 
+func generateClientID() [16]byte {
+	return uuid.NewV4()
+}
+
+// initializes websocket connection for a client by upgrading the http connection
+// for each connected client writer and reader is created. these goroutines are responsible of handling receiving/sending messages.
 func serveWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		logger.Println(err)
 		return
 	}
-	client := &Client{hub: hub, conn: conn, send: make(chan []byte, 256)}
+	
+	client := &Client{id: generateClientID(), hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
 
 	go client.writer()

@@ -23,6 +23,13 @@ without having to poll the server for a reply.
 -   **Websocket**    : The primary interface for connecting to a Websocket server and then sending and receiving data on the connection.
 -   **CloseEvent**   : The event sent by the Websocket object when the connection closes.
 -   **MessageEvent** : The event sent by the Websocket object when a message is received from the server
+
+## Build & Run
+```
+$ go build -o server.exe
+
+$ server.exe
+```
  
 # Resources
 -   [Writing Websocket applications](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API/Writing_WebSocket_client_applications#Receiving_messages_from_the_server)

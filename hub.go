@@ -17,6 +17,7 @@ func initHub() *Hub {
 	}
 }
 
+// endlessly listens register / unregister / inbound channels
 func (h *Hub) start() {
 	for {
 		select {
@@ -28,6 +29,7 @@ func (h *Hub) start() {
 				delete(h.clients, client)
 				close(client.send)
 			}
+			logger.Printf("Total clients: %d", len(h.clients))
 		case message := <-h.inbound:
 			for client := range h.clients {
 				select {

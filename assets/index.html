@@ -1,20 +1,41 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Websocket</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css">
-    <script src="main.js"></script> -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" media="screen" href="css/style.css">
+    <!-- <script src="main.js"></script> -->    
 </head>
+
 <body>
-    <input type="text" id="input" autocomplete="off">
-    <button id="send">Send</button>
+    <div class="container">
+        <h2 class="text-center">Chat</h2>
+        <div class="row">
+            <div class="col">
+                <div id="chatbox">
+                    <div id="chat-content"></div>
+                </div>
+            </div>
+            <div class="col">
+                <form class="form-inline">
+                    <div class="form-group mb-2">
+                        <input id="input" type="text" class="form-control">                        
+                    </div>
+                    <button class="btn btn-primary mb-2" id="send" type="button">Send</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
 
     <script>
         var input = document.querySelector("#input")
         var button = document.querySelector("#send")
+        var chatbox = document.getElementById("chat-content")
 
         // creating a WebSocket object, accepts url as a parameter
         function WsClient(url) {
@@ -37,11 +58,15 @@
                 try {
                     let data = JSON.parse(response.data);
                     if (data.event = 'message') {
+                        let div = document.createElement('div')
+                        div.classList.add('card');
                         let msg = document.createElement('p');
+                        msg.classList.add('card-body');
                         msg.innerText = data.data;
-                        document.body.appendChild(msg);
+                        div.appendChild(msg);
+                        chatbox.appendChild(div);
                     }
-                } catch(e) {
+                } catch (e) {
                     console.log(e);
                 }
             }
@@ -50,7 +75,7 @@
                 console.log('connection closed')
             }
         }
-        
+
         // creating a new websocket connection object -by connecting to server's URL. ws for HTTP. wss for HTTPS
         var ws = new WsClient('ws://' + window.location.origin.replace('http://', '') + '/ws');
 
@@ -62,4 +87,5 @@
         }
     </script>
 </body>
+
 </html>
