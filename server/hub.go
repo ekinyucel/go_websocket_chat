@@ -23,17 +23,19 @@ func (h *Hub) start() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
-			logger.Printf("Total clients: %d", len(h.clients))
+			e := Event{Event: "clients", Data: len(h.clients), Date: 154121234654}
+			client.send <- e.marshal()
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
+				e := Event{Event: "clients", Data: len(h.clients), Date: 154121234654}
+				client.send <- e.marshal()
 				close(client.send)
 			}
-			logger.Printf("Total clients: %d", len(h.clients))
 		case message := <-h.inbound:
 			for client := range h.clients {
 				select {
-				case client.send <- message:
+				case client.send <- message: // sending incoming message to the send channel of each client
 				default:
 					close(client.send)
 					delete(h.clients, client)

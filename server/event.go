@@ -4,9 +4,10 @@ import "encoding/json"
 
 // Event struct is used for storing the event as a Json object.
 type Event struct {
-	Name string      `json:"event"`
-	Data interface{} `json:"data"`
-	Date int         `json:"date"`
+	Username string      `json:"username"`
+	Event    string      `json:"event"`
+	Data     interface{} `json:"data"`
+	Date     int         `json:"date"`
 }
 
 // UnMarshalEvent function is used to create an Event type from input

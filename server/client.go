@@ -26,6 +26,7 @@ type Client struct {
 }
 
 // reader reads messages from the websocket connection to hub.
+// hub gets message from clients through reader method of each client
 func (c *Client) reader() {
 	defer func() {
 		c.hub.unregister <- c
@@ -51,6 +52,7 @@ func (c *Client) reader() {
 }
 
 // writer sends messages from the hub to all websocket listeners
+// allowing hub to send gathered to all clients
 func (c *Client) writer() {
 	defer func() {
 		c.conn.Close()
@@ -67,6 +69,7 @@ func (c *Client) writer() {
 				return
 			}
 			w.Write(message)
+			logger.Println("message ", message)
 
 			// adding queued messages
 			n := len(c.send)
