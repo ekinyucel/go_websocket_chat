@@ -20,10 +20,15 @@ func main() {
 
 	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
 		serveWebSocket(hub, w, r)
+		enableCors(&w)
 	})
 
 	logger.Printf("The server is listening on port %v", *addr)
 	if err := http.ListenAndServe(*addr, nil); err != nil {
 		logger.Fatalf("ListenAndServe: %v", err)
 	}
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
