@@ -3,16 +3,23 @@
   <div class="row">
     <div class="col">
       <div id="chatbox">
-        <div id="chat-content"></div>
+        <div id="chat-content" *ngFor="let message of messages">
+          <div *ngIf="messages?.length != 0">
+              {{message.user}} : {{message.message}}
+          </div>
+
+        </div>
       </div>
     </div>
     <div class="col">
-      <form class="form-inline">
+      <form [formGroup]="formGroup" class="form-inline">
         <mat-form-field class="example-full-width">
-          <input matInput placeholder="Username" id="username" type="text" class="form-control">
+          <input formControlName="username" matInput placeholder="Username" id="username" type="text"
+            class="form-control">
         </mat-form-field>
         <mat-form-field class="example-full-width">
-          <textarea matInput placeholder="Send a message" id="input"></textarea>
+          <textarea formControlName="message" matInput placeholder="Send a message" id="input"
+            name="message"></textarea>
         </mat-form-field>
         <button class="btn btn-lg btn-primary btn-block" type="button" (click)='sendMessage()'>Send</button>
       </form>

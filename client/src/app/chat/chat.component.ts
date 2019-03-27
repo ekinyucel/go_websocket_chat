@@ -1,53 +1,45 @@
 import { Component, OnInit } from '@angular/core';
-import { SocketService } from './socket.services';
+import { WebSocketService } from './websocket.service';
 import { EventEnum, Action } from './shared/model/chat-enums';
+import { ChatService } from './chat.service';
+import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
+import { Subject } from 'rxjs';
+
+export interface Message {
+  user: string;
+  message: string;
+}
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css']
+  styleUrls: ['./chat.component.css'],
+  providers: [ WebSocketService, ChatService ]
 })
-export class ChatComponent implements OnInit {
-  action = Action;
-  events: Event[] = [];
-  connection: any;
+export class ChatComponent {
+  formGroup: FormGroup;
+  messages: Message[] = [];
 
-  constructor(private _socketService: SocketService) { }
+  constructor(private _chatService: ChatService, fb: FormBuilder) {
+    console.log(this.messages.length);
+    _chatService.messages.subscribe(msg => {
+      this.messages.push(msg);
+      console.log('response from websocket: ' + msg.message);
+    });
 
-  ngOnInit(): void {
-    this.initConnection();
+    this.formGroup = fb.group({
+      username: fb.control('username', Validators.required),
+      message: fb.control('message', Validators.required)
+    });
   }
 
-  private initConnection(): void {
-    this._socketService.initSocket();
-
-    this.connection = this._socketService.onMessage()
-      .subscribe((event: Event) => {
-        console.log('data ', event);
-      });
-
-    /*this.connection = this._socketService.onMessage()
-      .subscribe((event: Event) => {
-        this.events.push(event);
-      });
-
-    this._socketService.onEvent(EventEnum.CONNECT)
-      .subscribe(() => {
-        console.log('connected');
-      });
-
-    this._socketService.onEvent(EventEnum.DISCONNECT)
-      .subscribe(() => {
-        console.log('disconnected');
-      });*/
-  }
-
-  public sendMessage(message: string): void {
-    console.log('sendMessage');
-    if (!message) {
-      return;
-    }
-    console.log('sendMessage');
+  public sendMessage(): void {
+    const message = {
+      user: this.formGroup.get('username').value,
+      message: this.formGroup.get('message').value
+    };
+    console.log('new message from client to websocket: ', message);
+    this._chatService.messages.next(message);
   }
 
 }
