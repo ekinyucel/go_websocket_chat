@@ -23,13 +23,13 @@ func (h *Hub) start() {
 		select {
 		case client := <-h.register:
 			h.clients[client] = true
-			e := Event{Event: "clients", Data: len(h.clients), Date: 154121234654}
-			client.send <- e.marshal()
+			m := &Message{Data: len(h.clients), Type: "connect"}
+			h.send(m.marshal())
 		case client := <-h.unregister:
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
-				e := Event{Event: "clients", Data: len(h.clients), Date: 154121234654}
-				client.send <- e.marshal()
+				m := &Message{Data: len(h.clients), Type: "disconnect"}
+				h.send(m.marshal())
 				close(client.send)
 			}
 		case message := <-h.inbound:
@@ -42,5 +42,11 @@ func (h *Hub) start() {
 				}
 			}
 		}
+	}
+}
+
+func (h *Hub) send(message []byte) {
+	for client := range h.clients {
+		client.send <- message
 	}
 }

@@ -39,11 +39,11 @@ func (c *Client) reader() {
 			break
 		}
 
-		event, err := UnMarshalEvent(message)
+		event, err := UnMarshalMessage(message)
 		if err != nil {
 			logger.Printf("unable to parse: %v", err)
 		} else {
-			logger.Println("event ", event)
+			logger.Println("message ", event)
 		}
 
 		message = bytes.TrimSpace(message)
@@ -69,7 +69,6 @@ func (c *Client) writer() {
 				return
 			}
 			w.Write(message)
-			logger.Println("message ", message)
 
 			// adding queued messages
 			n := len(c.send)

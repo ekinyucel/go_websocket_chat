@@ -1,30 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { WebSocketService } from './websocket.service';
-import { EventEnum, Action } from './shared/model/chat-enums';
 import { ChatService } from './chat.service';
-import { FormGroup, FormControl, FormBuilder, Validators } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 
 export interface Message {
   user: string;
-  message: string;
+  data: string;
+  date: string;
+  type: string;
 }
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.css'],
-  providers: [ WebSocketService, ChatService ]
+  providers: [ WebSocketService, ChatService, DatePipe ]
 })
 export class ChatComponent {
   formGroup: FormGroup;
   messages: Message[] = [];
+  clients = 0;
 
-  constructor(private _chatService: ChatService, fb: FormBuilder) {
-    console.log(this.messages.length);
+  constructor(private _chatService: ChatService,
+              fb: FormBuilder,
+              private datePipe: DatePipe) {
     _chatService.messages.subscribe(msg => {
+      switch (msg.type) {
+        case 'connect': {
+          this.clients = +msg.data; // string to int conversion
+          msg.data = 'A new client has connected';
+          break;
+        }
+        case 'disconnect': {
+          this.clients = +msg.data;
+          msg.data = 'A client has disconnected';
+          break;
+        }
+      }
       this.messages.push(msg);
-      console.log('response from websocket: ' + msg.message);
+
+      console.log('response from websocket: ' + msg.data);
     });
 
     this.formGroup = fb.group({
@@ -36,10 +52,16 @@ export class ChatComponent {
   public sendMessage(): void {
     const message = {
       user: this.formGroup.get('username').value,
-      message: this.formGroup.get('message').value
+      data: this.formGroup.get('message').value,
+      date: this.formatDate(new Date()),
+      type: 'message' // TODO make it constant
     };
     console.log('new message from client to websocket: ', message);
     this._chatService.messages.next(message);
+  }
+
+  public formatDate(date: Date) {
+    return this.datePipe.transform(date, 'yyyy/MM/dd hh:mm:ss');
   }
 
 }

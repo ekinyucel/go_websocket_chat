@@ -1,3 +1,71 @@
 /* You can add global styles to this file, and also import other style files */
 @import '~bootstrap/dist/css/bootstrap.min.css';
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.header {
+  background-color: #15223b;
+  width: 100%;
+  margin: 0;
+  padding: 10px;
+  color: white;
+}
+
+.header h2 {
+  margin: 0;
+  padding: 0;
+}
+
+#chatbox {
+  height:500px;
+  overflow-y: scroll;
+}
+
+#chatContent {
+  list-style-type: none;
+  background-color: #f7f7f7;
+  margin: 0;
+  padding: 0;
+}
+
+#chatContent h2 {
+  margin: 0;
+  padding: 0;
+}
+
+#chatContent li {
+  padding: 5px 0px;
+}
+
+.chatInput {
+  width: 95%;
+  display: block;
+  margin: auto;
+  position: fixed; bottom: 0;
+}
+
+.chatInput input {
+  padding: 10px;
+  margin: 0;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  width: 98%;
+  box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.1);
+}
+
+.message {
+  display: block;
+  background-color: white;
+  margin: 10px auto;
+  box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.2);
+  padding: 10px 20px;
+  border-radius: 5px;
+  clear: both;
+}
