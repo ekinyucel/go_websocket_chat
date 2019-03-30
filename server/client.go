@@ -21,6 +21,7 @@ var upgrader = websocket.Upgrader{
 type Client struct {
 	id   [16]byte
 	hub  *Hub
+	room *Room
 	conn *websocket.Conn
 	send chan []byte // outbound channel of a client
 }

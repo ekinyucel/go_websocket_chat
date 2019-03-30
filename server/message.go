@@ -6,7 +6,7 @@ import "encoding/json"
 type Message struct {
 	Username string      `json:"user"`
 	Data     interface{} `json:"data"`
-	Date     int         `json:"date"`
+	Date     string      `json:"date"`
 	Type     string      `json:"type"`
 }
 

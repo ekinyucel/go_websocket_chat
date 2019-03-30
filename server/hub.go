@@ -3,6 +3,7 @@ package main
 // Hub is used for maintaining the active clients and broadcasts messages to all clients
 type Hub struct {
 	clients    map[*Client]bool
+	rooms      map[*Room]bool
 	inbound    chan []byte
 	register   chan *Client
 	unregister chan *Client
@@ -11,6 +12,7 @@ type Hub struct {
 func initHub() *Hub {
 	return &Hub{
 		clients:    make(map[*Client]bool),
+		rooms:      make(map[*Room]bool),
 		inbound:    make(chan []byte),
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
@@ -22,23 +24,29 @@ func (h *Hub) start() {
 	for {
 		select {
 		case client := <-h.register:
-			h.clients[client] = true
-			m := &Message{Data: len(h.clients), Type: "connect"}
-			h.send(m.marshal())
+			var room *Room
+			if len(h.rooms) == 0 {
+				room = initRoom(h, "general") // hardcoded for now
+				h.rooms[room] = true
+				go room.start()
+			}
+			client.room = room
+			for r := range h.rooms {
+				if r.name == "general" { // hardcoded for now
+					r.clients[client] = true
+					r.register <- client
+				}
+			}
 		case client := <-h.unregister:
-			if _, ok := h.clients[client]; ok {
-				delete(h.clients, client)
-				m := &Message{Data: len(h.clients), Type: "disconnect"}
-				h.send(m.marshal())
-				close(client.send)
+			for r := range h.rooms {
+				if r.name == "general" { // hardcoded for now
+					r.unregister <- client
+				}
 			}
 		case message := <-h.inbound:
-			for client := range h.clients {
-				select {
-				case client.send <- message: // sending incoming message to the send channel of each client
-				default:
-					close(client.send)
-					delete(h.clients, client)
+			for r := range h.rooms {
+				if r.name == "general" { // hardcoded for now
+					r.inbound <- message
 				}
 			}
 		}
