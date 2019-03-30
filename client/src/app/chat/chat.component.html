@@ -1,14 +1,16 @@
 <div class="header">
-    <h2 class="text-center">Chat</h2>
+  <h2 class="text-center">Chat</h2>
 </div>
 <div class="container">
   <div class="row">
-    <div class="col">
+    <div class="col-sm-2 col-md-2">
+      #general ({{ clients }})
+    </div>
+    <div class="col-sm-10 col-md-10">
       <div id="chatbox">
-        #general ({{ clients }})
-        <ul id="chatContent" *ngFor="let message of messages">          
+        <ul id="chatContent" *ngFor="let message of messages">
           <li *ngIf="messages?.length != 0 && message.user !== ''; else newClient" class="message">
-              ({{ message.date }}) | {{ message.user }} : {{ message.data }}
+            ({{ message.date }}) | {{ message.user }} : {{ message.data }}
           </li>
           <ng-template #newClient>
             <ul>
@@ -20,17 +22,18 @@
         </ul>
       </div>
     </div>
+  </div>
+  <div class="row">
     <div class="chatInput">
       <form [formGroup]="formGroup" class="form-inline">
         <!--<mat-form-field class="example-full-width">
-          <input formControlName="username" matInput placeholder="Username" id="username" type="text"
-            class="form-control">
-        </mat-form-field>-->
-        <mat-form-field class="example-full-width">
-          <input formControlName="message" matInput placeholder="Send a message" id="input"
-            name="message">
+              <input formControlName="username" matInput placeholder="Username" id="username" type="text"
+                class="form-control">
+            </mat-form-field>-->
+        <mat-form-field>
+          <input matInput formControlName="message" placeholder="Send a message" id="input" name="message">
         </mat-form-field>
-        <button class="btn btn-lg btn-primary btn-block" type="button" (click)='sendMessage()'>Send</button>
+        <button class="btn btn-md btn-primary btn-block" type="button" (click)='sendMessage()'>Send</button>
       </form>
     </div>
   </div>
