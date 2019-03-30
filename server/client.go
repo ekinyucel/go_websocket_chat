@@ -1,6 +1,8 @@
 package main
 
 import (
+	"time"
+	"math/rand"
 	"bytes"
 	"net/http"
 
@@ -20,6 +22,7 @@ var upgrader = websocket.Upgrader{
 // Client struct defines types for handling client side operations
 type Client struct {
 	id   [16]byte
+	name string
 	hub  *Hub
 	room *Room
 	conn *websocket.Conn
@@ -89,6 +92,13 @@ func generateClientID() [16]byte {
 	return uuid.NewV4()
 }
 
+func generateClientName() string {
+	usernames := []string{"admin", "moderator", "artiz"}
+	rand.Seed(time.Now().UnixNano())
+	index := rand.Intn(len(usernames) - 0) + 0
+	return usernames[index]
+}
+
 // initializes websocket connection for a client by upgrading the http connection
 // for each connected client writer and reader is created. these goroutines are responsible of handling receiving/sending messages.
 func serveWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request) {
@@ -98,7 +108,7 @@ func serveWebSocket(hub *Hub, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	
-	client := &Client{id: generateClientID(), hub: hub, conn: conn, send: make(chan []byte, 256)}
+	client := &Client{id: generateClientID(), name: generateClientName(), hub: hub, conn: conn, send: make(chan []byte, 256)}
 	client.hub.register <- client
 
 	go client.writer()

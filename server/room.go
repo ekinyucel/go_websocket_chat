@@ -27,12 +27,12 @@ func (r *Room) start() {
 		select {
 		case client := <-r.register:
 			r.clients[client] = true
-			m := &Message{Data: len(r.clients), Type: "connect"}
+			m := &Message{Username: client.name, Data: len(r.clients), Room: r.name, Type: "connect"}
 			r.send(m.marshal())
 		case client := <-r.unregister:
 			if _, ok := r.clients[client]; ok {
 				delete(r.clients, client)
-				m := &Message{Data: len(r.clients), Type: "disconnect"}
+				m := &Message{Data: len(r.clients), Room: r.name, Type: "disconnect"}
 				r.send(m.marshal())
 				close(client.send)
 			}

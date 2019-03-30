@@ -6,6 +6,7 @@ import { WebSocketService } from './websocket.service';
 export interface Message {
     user: string;
     data: string;
+    room: string;
     date: string;
     type: string;
 }
@@ -23,6 +24,7 @@ export class ChatService {
                 return {
                     user: responseJSON.user,
                     data: responseJSON.data,
+                    room: responseJSON.room,
                     date: responseJSON.date,
                     type: responseJSON.type
                 };

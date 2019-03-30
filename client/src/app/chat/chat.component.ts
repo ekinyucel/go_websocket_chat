@@ -7,6 +7,7 @@ import { DatePipe } from '@angular/common';
 export interface Message {
   user: string;
   data: string;
+  room: string;
   date: string;
   type: string;
 }
@@ -20,43 +21,48 @@ export interface Message {
 export class ChatComponent {
   formGroup: FormGroup;
   messages: Message[] = [];
-  clients = 0;
+  totalClients = 0;
+  clients: string[] = [];
 
   constructor(private _chatService: ChatService,
               fb: FormBuilder,
               private datePipe: DatePipe) {
     _chatService.messages.subscribe(msg => {
-      switch (msg.type) {
-        case 'connect': {
-          this.clients = +msg.data; // string to int conversion
-          msg.data = 'A new client has connected';
-          break;
-        }
-        case 'disconnect': {
-          this.clients = +msg.data;
-          msg.data = 'A client has disconnected';
-          break;
-        }
-      }
-      this.messages.push(msg);
+      msg = this.detectMessageType(msg);
 
-      console.log('response from websocket: ' + msg.data);
+      this.messages.push(msg);
     });
 
     this.formGroup = fb.group({
-      username: fb.control('username', Validators.required),
       message: fb.control('message', Validators.required)
     });
+  }
+
+  public detectMessageType(msg: Message): Message {
+    switch (msg.type) {
+      case 'connect': {
+        this.totalClients = +msg.data; // string to int conversion
+        msg.data = 'A new client has connected';
+        this.clients.push(msg.user);
+        break;
+      }
+      case 'disconnect': {
+        this.totalClients = +msg.data;
+        msg.data = 'A client has disconnected';
+        break;
+      }
+    }
+    return msg;
   }
 
   public sendMessage(): void {
     const message = {
       user: this.formGroup.get('username').value,
       data: this.formGroup.get('message').value,
+      room: 'general', // hardcoded for now
       date: this.formatDate(new Date()),
       type: 'message' // TODO make it constant
     };
-    console.log('new message from client to websocket: ', message);
     this._chatService.messages.next(message);
   }
 
