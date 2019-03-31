@@ -18,7 +18,7 @@ export class ChatService {
     public messages: Subject<Message>;
 
     constructor(_websocketService: WebSocketService) {
-        this.messages = <Subject<Message>>_websocketService.connect('ws://localhost:8080/ws').pipe(map(
+        this.messages = <Subject<Message>>_websocketService.connect('ws://70b57e15.ngrok.io/ws').pipe(map(
             (response: MessageEvent): Message => {
                 const responseJSON = JSON.parse(response.data);
                 return {

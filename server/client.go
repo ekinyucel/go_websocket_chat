@@ -29,6 +29,12 @@ type Client struct {
 	send chan []byte // outbound channel of a client
 }
 
+// User represents the user who is chatting on the platform
+type User struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 // reader reads messages from the websocket connection to hub.
 // hub gets message from clients through reader method of each client
 func (c *Client) reader() {

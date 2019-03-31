@@ -57,7 +57,7 @@ export class ChatComponent {
 
   public sendMessage(): void {
     const message = {
-      user: this.formGroup.get('username').value,
+      user: this.clients[0],
       data: this.formGroup.get('message').value,
       room: 'general', // hardcoded for now
       date: this.formatDate(new Date()),

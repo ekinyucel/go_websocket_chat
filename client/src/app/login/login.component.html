@@ -1,0 +1,14 @@
+<div class="cont">
+  <div class="form">
+    <form [formGroup]="formGroup" class="form">
+      <h1>Login</h1>
+      <mat-form-field>
+        <input matInput formControlName="username" type="text" class="user" placeholder="Username" />
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput formControlName="password" type="password" class="pass" placeholder="Password" />
+      </mat-form-field>
+      <button class="login"type="button" (click)='login()'>Login</button>
+    </form>
+  </div>
+</div>
