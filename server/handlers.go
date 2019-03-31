@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 )
 
@@ -19,32 +18,33 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576)) // read the body of the request
 
 	if err != nil {
-		log.Fatalln("Error LoginHandler", err)
+		logger.Fatalln("Error LoginHandler", err)
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	if err := r.Body.Close(); err != nil {
-		log.Fatalln("Error LoginHandler", err)
+		logger.Fatalln("Error LoginHandler", err)
 	}
 
 	if err := json.Unmarshal(body, &user); err != nil { // unmarshall body contents as a type Candidate
 		logger.Println("username ", user.Username, " password ", user.Password)
-		log.Println(err)
+		logger.Println(err)
 		if err := json.NewEncoder(w).Encode(err); err != nil {
-			log.Fatalln("Error LoginHandler unmarshalling data", err)
+			logger.Fatalln("Error LoginHandler unmarshalling data", err)
 			w.WriteHeader(http.StatusInternalServerError) // unprocessable entity
 			return
 		}
 	}
 
-	userJSON, err := json.Marshal(user)
+	response, err := json.Marshal(&Response{Message: user.Username, StatusCode: http.StatusOK})
+
 	if err != nil {
-		logger.Fatalln(err)
+		logger.Fatalln("response json marshall error")
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(userJSON)
+	w.Write(response)
 	return
 }

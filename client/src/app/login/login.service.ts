@@ -3,7 +3,8 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from './user';
 
 export interface Response {
-    response: string;
+    message: string;
+    statuscode: number;
 }
 
 @Injectable({
@@ -22,7 +23,7 @@ export class LoginService {
             })
         };
 
-        return this.httpClient.post<User>(`http://localhost:8080/login`, user, headers)
+        return this.httpClient.post<Response>(`http://localhost:8080/login`, user, headers)
             .subscribe(res => {
                 console.log('res', res);
             }, err => {
