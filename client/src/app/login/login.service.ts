@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { User } from './user';
+import { Router } from '@angular/router';
 
 export interface Response {
     message: string;
@@ -10,11 +11,17 @@ export interface Response {
 @Injectable({
     providedIn: 'root'
 })
-export class LoginService {
-    constructor(private httpClient: HttpClient) { }
+export class LoginService implements OnInit {
+    private authenticated = false;
+
+    constructor(private httpClient: HttpClient,
+        private router: Router) { }
+
+    ngOnInit() {
+        this.authenticated = false;
+    }
 
     public login(user: User) {
-        console.log('user ', user);
         const headers = {
             headers: new HttpHeaders({
                 'Access-Control-Allow-Origin': '*',
@@ -25,7 +32,10 @@ export class LoginService {
 
         return this.httpClient.post<Response>(`http://localhost:8080/login`, user, headers)
             .subscribe(res => {
-                console.log('res', res);
+                if (res.statuscode === 200) {
+                    this.router.navigateByUrl('/');
+                    this.authenticated = true;
+                }
             }, err => {
                 console.log('Error occured', err);
             });
